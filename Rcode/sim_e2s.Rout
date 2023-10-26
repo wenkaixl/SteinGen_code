@@ -1,0 +1,96 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> setwd("/home/wenkaix/Workspace/SteinGen/Rcode")
+> library(network)
+
+‘network’ 1.18.1 (2023-01-24), part of the Statnet Project
+* ‘news(package="network")’ for changes since last version
+* ‘citation("network")’ for citation information
+* ‘https://statnet.org’ for help, support, and other information
+
+> library(ergm)
+
+‘ergm’ 4.4.0 (2023-01-26), part of the Statnet Project
+* ‘news(package="ergm")’ for changes since last version
+* ‘citation("ergm")’ for citation information
+* ‘https://statnet.org’ for help, support, and other information
+
+‘ergm’ 4 is a major update that introduces some backwards-incompatible
+changes. Please type ‘news(package="ergm")’ for a list of major
+changes.
+
+> 
+> # source("../Rcode/sim_ergm.R")
+> 
+> d.list = c(100, 500, 1000, 1500, 2000)
+> N = 20
+> 
+> for (di in 1:4){
++   d = d.list[di]
++   print(d)
++   un=network(d, directed = FALSE)
++   model0<- un ~ edges +kstar(2)
++   coef = c(-1.5, 1.0/d)
++   start_time <- Sys.time()
++   g.sim  <- simulate(model0, nsim=N, coef=coef, 
++                      control=control.simulate(MCMC.burnin=d*(100), MCMC.batch=20))
++   
++   # generate the network adjacency matrices  
++   g.adj = c()
++   for (ii in 1:N){
++     g.adj= c(g.adj, list(g.sim[[ii]][,]))
++   }
++   end_time <- Sys.time()
++   print(end_time - start_time)
++   
++   filename = paste(paste("E2S100_b1_15_n",d, sep = ""),".rds", sep="")
++   saveRDS(g.adj, file=filename)
++   rm(g.sim)
++   rm(g.adj)
++   gc()
++   print("done")
++ }
+[1] 100
+Time difference of 0.9716251 secs
+[1] "done"
+[1] 500
+Time difference of 1.628871 mins
+[1] "done"
+[1] 1000
+Time difference of 8.419567 mins
+[1] "done"
+[1] 1500
+Time difference of 20.94438 mins
+[1] "done"
+> 
+> 
+> # 
+> # 
+> # for (ii in 1:N-1){
+> #   g1 = as.matrix(g.sim[[ii+1]])
+> #   g2 = as.matrix(g.sim[[ii+2]])
+> #   print(sum(abs(g1-g2)))
+> # }
+> 
+> proc.time()
+    user   system  elapsed 
+1866.713    0.885 1868.604 
